@@ -1,0 +1,22 @@
+{
+  "name": "gb_node",
+  "version": "1.0.0",
+  "description": "my file",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ocean369/GBNode.git"
+  },
+  "author": "calibr <awcalibr@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ocean369/GBNode/issues"
+  },
+  "homepage": "https://github.com/Ocean369/GBNode#readme",
+  "dependencies": {
+    "events": "^3.3.0"
+  }
+}

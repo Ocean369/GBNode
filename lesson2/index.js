@@ -8,13 +8,23 @@ class EndDate {
     constructor(emit, name, date) {
         this.emit = emit
         this.name = name
-        this.date = date
+        this.argArr = date.split('-')
+        this.date = ''
         this.create()
     }
+    #checkDate() {
+        let result = true
+        this.argArr.forEach((val, ind) => {
+            if ((ind !== 4 && val.length !== 2) || (ind === 4 && val.length !== 4)) { result = false }
+        });
+        return result
+    }
     create() {
-        let argArr = this.date.split('-');
-        this.date = `${argArr[4]}-${argArr[3]}-${argArr[2]}T${argArr[0]}:${argArr[1]}:00`;
-        this.emit.emit('timer', this);
+        if (this.#checkDate()) {
+            this.date = `${this.argArr[4]}-${this.argArr[3]}-${this.argArr[2]}T${this.argArr[0]}:${this.argArr[1]}:00`;
+            this.emit.emit('timer', this);
+        }
+        else { console.log(`У ${this.name} не правильно введены данные`) }
     }
 }
 

@@ -8,23 +8,18 @@ class EndDate {
     constructor(emit, name, date) {
         this.emit = emit
         this.name = name
-        this.argArr = date.split('-')
-        this.date = ''
+        this.date = {
+            year: date[4],
+            month: date[3],
+            day: date[2],
+            minute: date[1],
+            hour: date[0]
+        }
         this.create()
     }
-    #checkDate() {
-        let result = true
-        this.argArr.forEach((val, ind) => {
-            if ((ind !== 4 && val.length !== 2) || (ind === 4 && val.length !== 4)) { result = false }
-        });
-        return result
-    }
+
     create() {
-        if (this.#checkDate()) {
-            this.date = `${this.argArr[4]}-${this.argArr[3]}-${this.argArr[2]}T${this.argArr[0]}:${this.argArr[1]}:00`;
-            this.emit.emit('timer', this);
-        }
-        else { console.log(`У ${this.name} не правильно введены данные`) }
+        this.emit.emit('timer', this);
     }
 }
 
@@ -34,7 +29,7 @@ emitter.on('timer', (Obj) => {
         // Получение времени сейчас
         let now = new Date();
         // Получение заданного времени
-        let end_date = new Date(Obj.date);
+        let end_date = new Date(Obj.date.year, Obj.date.month, Obj.date.day, Obj.date.hour, Obj.date.minute);
         // Вычисление разницы времени 
         let ms_left = end_date - now;
         // Если разница времени меньше или равна нулю 
@@ -53,7 +48,11 @@ emitter.on('timer', (Obj) => {
 });
 
 
-let argDate = process.argv.splice(2);
+let argDate = process.argv.splice(2).map(item => {
+    let newItem = item.split('-');
+    newItem[3]--;
+    return newItem
+})
 
 for (let i = 0; i < argDate.length; i++) {
     new EndDate(emitter, `Timer ${i + 1}`, argDate[i]);

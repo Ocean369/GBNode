@@ -2,7 +2,7 @@ import { createReadStream, createWriteStream, WriteStream } from 'fs'
 import { once } from 'events'
 import { createInterface } from 'readline'
 
-const IP = ['89.123.1.41', '34.48.240.111'];
+const IP = ['127.0.0.1'];
 let ws = [];
 let re = [];
 
@@ -31,8 +31,10 @@ class WS extends WriteStream {
                 flags: 'a',
                 encoding: 'utf8'
             });
-            re[i] = new RegExp(`^${val}`);
+            re[i] = /^127\.0\.0\.1/g;
         })
+
+        console.log(re)
 
         rl.on('line', (line) => {
             re.forEach((val, i) => {

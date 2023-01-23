@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import fsp from 'fs/promises'
 import { createReadStream } from 'fs'
 import { createInterface } from 'readline'
@@ -17,7 +19,6 @@ function start() {
             message: `Хотите ли вы остаться в текущей диретории \n  ${__dirname}`,
         })
         .then(({ answer }) => {
-            console.log('answer', answer)
             if (!answer) {
                 const rl = createInterface({
                     input: process.stdin,
@@ -111,5 +112,3 @@ function processLineByLine(path, pattern) {
         console.error(err);
     }
 };
-
-

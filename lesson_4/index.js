@@ -25,12 +25,11 @@ function start() {
                     output: process.stdout
                 })
 
-                rl.question('Please enter the directory:', (inDir) => {
+                rl.question('Пожалуйста, введите директорию:', (inDir) => {
                     goToDir(inDir, rl);
                 })
 
                 rl.on('close', () => process.exit(0))
-
             } else {
                 goToDir(__dirname);
             }
@@ -53,7 +52,7 @@ function goToDir(__dirname, rlObj = null) {
                 .prompt({
                     name: "fileName",
                     type: 'list', // input, number, confirm, list, rawlist, expand, checkbox, password
-                    message: "Choose file",
+                    message: "Выберите файл или директорию: ",
                     choices
                 })
         })
@@ -80,17 +79,16 @@ function findPattern(path) {
             type: 'input', // input, number, confirm, list, rawlist, expand, checkbox, password
             message: "Введите строку для поиска: ",
         })
-        .then(({ pattern }) => { processLineByLine(path, pattern) })
+        .then(({ pattern }) => { searchLineByLine(path, pattern) })
         .catch((err) => {
             console.error(err);
-            process.exit(0)
+            process.exit(0);
         })
-
 }
 
 
 
-function processLineByLine(path, pattern) {
+function searchLineByLine(path, pattern) {
     try {
         const rlfind = createInterface({
             input: createReadStream(path),
@@ -111,4 +109,4 @@ function processLineByLine(path, pattern) {
     } catch (err) {
         console.error(err);
     }
-};
+}

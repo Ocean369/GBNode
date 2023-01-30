@@ -98,7 +98,7 @@ function searchLineByLine(path, pattern) {
         const re = new RegExp(pattern, 'ig');
         rlfind.on('line', (line) => {
             if (re.test(line)) findArray.push([...line.match(re)]);
-            console.log(line.replace(pattern, colors.yellow(pattern)));
+            console.log(line.replace(re, colors.yellow(pattern)));
         });
 
         rlfind.on('close', () => {

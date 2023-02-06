@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .auth {
+            width: 300px;
+            height: 200px;
+            display: none;
+            flex-direction: column;
+            background-color: linen;
+            border-radius: 5px;
+            border: 1px solid lightslategrey;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .messanger {
+            width: 300px;
+            border: 2px solid black;
+            display: none;
+            flex-direction: column;
+            background-color: linen;
+            border-radius: 5px;
+            border: 1px solid lightslategrey;
+            align-items: center;
+            gap: 5px;
+        }
+
+        #app {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            background-color: linen;
+            height: 500px;
+            overflow-y: auto;
+            align-self: stretch;
+        }
+
+        .mess_me {
+            background-color: lightgreen;
+            border-radius: 2px;
+            border: 1px solid gray;
+            margin: 5px;
+            max-width: 70%;
+            padding: 5px;
+            align-self: flex-end;
+            word-wrap: break-word;
+        }
+
+        .mess_part {
+            background-color: lightpink;
+            border-radius: 2px;
+            border: 1px solid gray;
+            max-width: 70%;
+            margin: 5px;
+            padding: 5px;
+            align-self: flex-start;
+            word-wrap: break-word;
+        }
+
+        .mess_conn {
+            background-color: lightsteelblue;
+            border-radius: 10px;
+            text-align: center;
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
+    <title>Messanger</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"
+        integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class='auth'>
+        <div id="error-container"></div>
+        <div>Введите имя пользователя:</div>
+        <input type="text" id="name" name='name' autofocus>
+        <button type="button" name="button" id="signIn">
+            Let me chat!
+        </button>
+    </div>
+    <div class='messanger'>
+        <h1>Messanger</h1>
+        <input type="text" id="input" autofocus>
+        <input type="submit" id="send" value="Send">
+        <div id="app"></div>
+    </div>
+</body>
+<script type="text/javascript">
+
+    const mess = document.querySelector('.messanger');
+    const auth = document.querySelector('.auth');
+    const socket = io('localhost:3000');
+    let user;
+
+    socket.on('connect', () => {
+        console.log('Connection with localhost:3000 created')
+        if (window.localStorage.getItem('userName')) {
+            mess.style.display = 'flex';
+            user = window.localStorage.getItem('userName');
+            socket.emit('setUserName', user);
+        } else {
+            auth.style.display = 'flex';
+        }
+    });
+
+    document.getElementById('signIn').
+        onclick = function () {
+            socket.emit('setUserName', document.getElementById('name').value);
+        };
+
+    socket.on('userExists', function (data) {
+        document.getElementById('error-container').innerHTML = data;
+    });
+
+    socket.on('userSet', function (data) {
+        user = data.username;
+        window.localStorage.setItem('userName', user);
+        mess.style.display = 'flex';
+        auth.style.display = 'none';
+
+    });
+
+    socket.on('NEW_CONN_EVENT', function (data) {
+        addMessage(data.msg);
+    });
+
+
+    socket.on('server-msg', (data) => {
+        if (data.user === user) {
+            document.getElementById('app').
+                innerHTML += `<div class='mess_me'><b>Me</b>: ${data.msg}</div>`;
+        } else {
+            document.getElementById('app').
+                innerHTML += `<div class='mess_part'><b>${data.user}</b>: ${data.msg}</div>`;
+        }
+    })
+
+    const addMessage = (msg) => {
+        document.getElementById('app').
+            innerHTML += `<div class='mess_conn'><b>${msg}</b></div>`;
+    };
+
+    socket.on('DISCONN_EVENT', ({ msg }) => {
+        addMessage(msg);
+    });
+
+    document.getElementById('send')
+        .onclick = function () {
+            socket.emit('client-msg', { msg: document.getElementById('input').value, user: user })
+            document.getElementById('input').value = ''
+        }
+
+
+</script>
+
+
+</html>

@@ -1,13 +1,13 @@
 import http from 'http';
 import path from 'path'
 import fsp from 'fs/promises'
-import { htmlDoc } from './html.js'
 import formidable from 'formidable';
-import { createReadStream } from 'fs'
+import { createReadStream, readFile } from 'fs'
 import { createInterface } from 'readline'
 
 const host = 'localhost'
 const port = 3000
+
 
 function showWhatDir(__dirname) {
     let list = '';
@@ -36,15 +36,28 @@ const server = http.createServer(async (req, res) => {
 
         if (src.isFile()) {
             res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(htmlDoc(`  <form  action='${__dirname}' method="POST" enctype="multipart/form-data">
-                                    <div> Введите строку для поиска:  <input type="text" name="search" /></div>
-                                    <input type="submit" value='Найти'>
-                                </form>`))
+            readFile('./index.html', 'utf8', (err, data) => {
+                if (err) {
+                    console.error(err);
+                    return
+                }
+                res.end(data.replace('#point', `<form  action='${__dirname}' method="POST" enctype="multipart/form-data">
+                <div> Введите строку для поиска:  <input type="text" name="search" /></div>
+                <input type="submit" value='Найти'>
+            </form>`))
+            })
+
         } else {
             res.writeHead(200, { 'Content-Type': 'text/html' });
             showWhatDir(__dirname)
                 .then((list) => {
-                    res.end(htmlDoc(list))
+                    readFile('./index.html', 'utf8', (err, data) => {
+                        if (err) {
+                            console.error(err);
+                            return
+                        }
+                        res.end(data.replace('#point', list))
+                    })
                 })
                 .catch(err => console.error(err))
         }
@@ -82,7 +95,14 @@ const server = http.createServer(async (req, res) => {
             });
 
             rlfind.on('close', () => {
-                res.end(htmlDoc(`<pre class='file'>${data}</pre>`));
+                readFile('./index.html', 'utf8', (err, data) => {
+                    if (err) {
+                        console.error(err);
+                        return
+                    }
+                    res.end(data.replace('#point', `<pre class='file'>${data}</pre>`))
+                })
+
             })
 
         });

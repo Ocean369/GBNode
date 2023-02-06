@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "nodemon": "^2.0.20",
+    "socket.io": "^4.5.4"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "messenger",
+  "version": "1.0.0",
+  "main": "server.js",
+  "author": "calibr <awcalibr@gmail.com>",
+  "license": "ISC",
+  "description": ""
+}

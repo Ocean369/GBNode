@@ -1,9 +1,9 @@
 import http from 'http';
-import path from 'path'
+import path from 'path';
 import fsp from 'fs/promises'
 import { htmlDoc } from './html.js'
 import formidable from 'formidable';
-import { createReadStream } from 'fs'
+import { createReadStream, stat } from 'fs'
 import { createInterface } from 'readline'
 
 const host = 'localhost'
@@ -32,22 +32,27 @@ const server = http.createServer(async (req, res) => {
             __dirname = req.url
         }
 
-        const src = await fsp.stat(__dirname);
-
-        if (src.isFile()) {
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(htmlDoc(`  <form  action='${__dirname}' method="POST" enctype="multipart/form-data">
+        stat(__dirname, (err, stats) => {
+            if (err) {
+                res.writeHead(err.httpCode || 400, { 'Content-Type': 'text/plain' });
+                res.end(String(err));
+                return;
+            }
+            if (stats.isFile(__dirname)) {
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                res.end(htmlDoc(`  <form  action='${__dirname}' method="POST" enctype="multipart/form-data">
                                     <div> Введите строку для поиска:  <input type="text" name="search" /></div>
                                     <input type="submit" value='Найти'>
                                 </form>`))
-        } else {
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            showWhatDir(__dirname)
-                .then((list) => {
-                    res.end(htmlDoc(list))
-                })
-                .catch(err => console.error(err))
-        }
+            } else {
+                res.writeHead(200, { 'Content-Type': 'text/html' });
+                showWhatDir(__dirname)
+                    .then((list) => {
+                        res.end(htmlDoc(list))
+                    })
+                    .catch(err => console.error(err))
+            }
+        });
 
     } else if (req.method === 'POST') {
         const form = formidable({ multiples: true });
@@ -59,12 +64,8 @@ const server = http.createServer(async (req, res) => {
                 res.end(String(err));
                 return;
             }
-            // res.writeHead(200, { 'Content-Type': 'application/json' });
-            // fsp.readFile(__dirname, 'utf-8')
-            //     .then(data => {
+
             res.writeHead(200, { 'Content-Type': 'text/html;charset=utf8' });
-            // console.log('function => ', searchLineByLine(__dirname, fields.search));
-            // console.log('field', fields.search);
 
             const rlfind = createInterface({
                 input: createReadStream(__dirname),
@@ -76,9 +77,12 @@ const server = http.createServer(async (req, res) => {
             const re = new RegExp(fields.search, 'ig');
 
             rlfind.on('line', (line) => {
-                if (re.test(line)) {
-                    data += `${line.replace(re, `<span >${fields.search}</span>`)}\n`;
-                } else { data += `${line}\n` }
+                let transform = line.replace(/</g, '&lt;');
+                transform = transform.replace(/>/g, '&gt;');
+                transform = transform.replace(re, `<span >${fields.search}</span>`);
+                // transform = transform.replace(/\n/g, '<br>');
+                data += `${transform}<br>`;
+
             });
 
             rlfind.on('close', () => {

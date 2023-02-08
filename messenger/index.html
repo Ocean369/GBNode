@@ -71,6 +71,20 @@
             margin: 5px;
             padding: 5px;
         }
+
+        .title {
+            font-weight: bolder;
+            font-size: 45px;
+            color: brown;
+            padding: 5px 50px;
+        }
+
+        #greet {
+            color: darkolivegreen;
+            align-self: flex-start;
+            font-size: 25px;
+            padding: 10px;
+        }
     </style>
     <title>Messanger</title>
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"
@@ -79,6 +93,7 @@
 </head>
 
 <body>
+    <div class='title'>Messanger</div>
     <div class='auth'>
         <div id="error-container"></div>
         <div>Введите имя пользователя:</div>
@@ -88,7 +103,7 @@
         </button>
     </div>
     <div class='messanger'>
-        <h1>Messanger</h1>
+        <div id='greet'></div>
         <input type="text" id="input" autofocus>
         <input type="submit" id="send" value="Send">
         <div id="app"></div>
@@ -98,6 +113,7 @@
 
     const mess = document.querySelector('.messanger');
     const auth = document.querySelector('.auth');
+    const greet = document.querySelector('#greet');
     const socket = io('localhost:3000');
     let user;
 
@@ -107,6 +123,7 @@
             mess.style.display = 'flex';
             user = window.localStorage.getItem('userName');
             socket.emit('setUserName', user);
+            greet.innerHTML = `Hi, ${user}`;
         } else {
             auth.style.display = 'flex';
         }
@@ -123,6 +140,7 @@
 
     socket.on('userSet', function (data) {
         user = data.username;
+        greet.innerHTML = `Hi, ${user}`;
         window.localStorage.setItem('userName', user);
         mess.style.display = 'flex';
         auth.style.display = 'none';

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        a {
+            text-decoration: none;
+            color: whitesmoke;
+            font-size: large;
+            font-weight: bold;
+            padding: 5px;
+        }
+
+        ul {
+            list-style: none;
+            background-color: gray;
+            border: 2px solid black;
+            width: 90%;
+            padding: 20px;
+            margin: 30px
+        }
+
+        .file {
+            margin: 30px;
+            background-color: lightgray;
+            border: 2px solid black;
+            font-size: small;
+            padding: 5px;
+            overflow-x: auto;
+            overflow-y: auto;
+        }
+
+        span {
+            color: red;
+        }
+
+        form {
+            background-color: gray;
+            margin: 30px;
+            padding: 10px;
+            border: 2px solid black;
+            color: whitesmoke;
+        }
+
+        input {
+            background: beige;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 20px;
+        }
+
+        div {
+            padding-bottom: 10px;
+            font-size: 20px;
+        }
+
+        #counter {
+            background-color: rgb(163, 218, 199);
+            border: 1px solid gray;
+            border-radius: 5px;
+            width: 300px;
+            height: 50px;
+            margin: 20px;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            color: green;
+        }
+
+        #file {
+            background-color: rgb(163, 218, 199);
+            border: 1px solid gray;
+            max-height: 500px;
+            overflow: auto;
+            padding: 20px;
+        }
+    </style>
+    <title>Directories</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"
+        integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div id='counter'></div>
+    #filelinks#
+</body>
+<script>
+    const socket = io('localhost:3000');
+    const counter = document.getElementById('counter');
+    const setCount = (count) => {
+        if (count === 1) {
+            counter.innerHTML = `${count} user online`
+        }
+        else { counter.innerHTML = `${count} users online` }
+    }
+
+    socket.on('connect', () => {
+        socket.emit('newUser');
+    })
+
+    socket.on('setCount', (counts) => {
+        setCount(counts);
+    })
+</script>
+
+</html>
